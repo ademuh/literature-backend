@@ -7,7 +7,6 @@ WORKDIR /app
 COPY . .
 
 RUN npm install
-#RUN npm install pm2 -g
 RUN npm install sequelize-cli -g
 RUN npx sequelize db:migrate --env production
 EXPOSE 5002
