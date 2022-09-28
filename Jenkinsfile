@@ -14,61 +14,60 @@ pipeline {
             steps {
                 sshagent([credential]){
                     sh """ssh -o StrictHostKeyChecking=no ${server} << EOF
-		    echo "Pulling Wayshub Backend Repository"
+                    echo "Pulling Wayshub Backend Repository"
                     cd ${dir}
                     docker container stop ${cont}
-                    docker image rm ${cont}:latest
-		    git pull ${rname} ${branch}
+                    docker image rm ${img}:latest
+                    git pull ${rname} ${branch}
                     exit
                     EOF"""
                 }
             }
         }
-            
+
         stage('Building Docker Image') {
             steps {
                 sshagent([credential]){
                     sh """ssh -o StrictHostKeyChecking=no ${server} << EOF
                     echo "Building Image"
-                    docker login
                     cd ${dir}
                     docker build -t ${img}:${env.BUILD_ID} .
-		    exit
+                    exit
                     EOF"""
                 }
             }
         }
-            
+
         stage('Image Deployment') {
             steps {
                 sshagent([credential]){
                     sh """ssh -o StrictHostKeyChecking=no ${server} << EOF
                     cd ${dir}
-                    docker tag ${img}:${env.BUILD_ID} ${img}:${env.BUILD_ID}-latest
-                    docker container run -d ${cont}
-		    exit
+                    docker tag ${img}:${env.BUILD_ID} ${img}:latest
+                    docker-compose -f ~/start-literature.yml up -d
+                    exit
                     EOF"""
                 }
             }
         }
-        
+
         stage('Pushing to Docker Hub (aimingds)') {
             steps {
                 sshagent([credential]){
                     sh """ssh -o StrictHostKeyChecking=no ${server} << EOF
                     cd ${dir}
-                    docker image push ${img}:${env.BUILD_ID}-latest
-		    exit
+                    docker image push ${img}:latest
+                    exit
                     EOF"""
                 }
             }
         }
-	stage('Push Notification Discord') {
-	   steps {
+        stage('Push Notification Discord') {
+           steps {
                 sshagent([credential]){
-		    discordSend description: "wayshub-backend:" + BUILD_ID, footer: "Kelompok 2 - Dumbways.id Devops Batch 13", link: BUILD_URL, result: currentBuild.currentResult, scmWebUrl: '', title: 'Wayshub-backend', webhookURL: 'https://discord.com/api/webhooks/1019867961349132379/f5XTPLZWgUBN3-QZ0E-OkFQPXOJrGdj0LOjHMsQA8jfYC9mL5W1bt60mc_UbpLi88ceM'
+                    discordSend description: "wayshub-backend:" + BUILD_ID, footer: "Ade Muhammad Safari - Dumbways.id Devops Batch 13", link: BUILD_URL, result: currentBuild.currentResult, scmWebUrl: '', title: 'Wayshub-backend', webhookURL: 'https://discord.com/api/webhooks/1024706033786028103/Bn02YoDHmtVnK2HpWxckZzCItV8LMjCcNNn5mdY-V_nCQDz-0N42R8cKevG03IurUJRH'                
 		}
-	    }	
-	}
+            }
+        }
     }
 }
