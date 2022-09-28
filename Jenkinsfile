@@ -1,4 +1,4 @@
-def branch = "development"
+def branch = "production"
 def rname = "origin"
 def dir = "~/literature-be/"
 def credential = 'appserver'
