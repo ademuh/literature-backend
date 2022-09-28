@@ -1,4 +1,4 @@
-#test
+#testing pipeline
 FROM node:10.24.1-alpine
 
 ENV NODE_ENV production
