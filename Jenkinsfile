@@ -1,10 +1,11 @@
-def branch = "production"
+def branch = "development"
 def rname = "origin"
 def dir = "~/literature-be/"
 def credential = 'appserver'
 def server = 'ade@103.187.146.122'
 def img = 'aimingds/literature-be'
 def cont = 'literature-be'
+def db = 'database'
 
 pipeline {
     agent any
@@ -17,6 +18,7 @@ pipeline {
                     echo "Pulling Wayshub Backend Repository"
                     cd ${dir}
                     docker container stop ${cont}
+                    docker container rm ${cont}
                     docker image rm ${img}:latest
                     git pull ${rname} ${branch}
                     exit
@@ -44,7 +46,8 @@ pipeline {
                     sh """ssh -o StrictHostKeyChecking=no ${server} << EOF
                     cd ${dir}
                     docker tag ${img}:${env.BUILD_ID} ${img}:latest
-                    docker-compose -f ~/start-literature.yml up -d
+                    cd ..
+                    docker-compose -f start-literature.yml up -d
                     exit
                     EOF"""
                 }
@@ -71,4 +74,3 @@ pipeline {
         }
     }
 }
-
