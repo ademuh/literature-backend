@@ -1,5 +1,4 @@
-#testing pipeline
-FROM node:10.24.1-alpine
+FROM node:16.17.1-alpine
 
 ENV NODE_ENV production
 ENV DATABASE_URL postgresql://ade:katasandi@10.36.116.28:5432/literature
